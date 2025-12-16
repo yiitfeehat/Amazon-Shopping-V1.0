@@ -23,3 +23,17 @@ export function addToCart(productId, quantity) {
         })
     }
 }
+
+
+export function deleteFromCart(productId) {
+    let newCart = [];
+
+    cart.forEach((item) => {
+        if (item.productId !== productId) {
+            newCart.push(item);
+        }
+    })
+
+    cart = newCart;
+
+}

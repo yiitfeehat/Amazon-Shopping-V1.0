@@ -1,6 +1,5 @@
-import { cart } from "../data/cart.js";
+import { cart, deleteFromCart } from "../data/cart.js";
 import { products } from "../data/products.js";
-
 let cartItemHTML = '';
 
 cart.forEach((cartItem) => {
@@ -8,7 +7,7 @@ cart.forEach((cartItem) => {
     const matchingProduct = products.find(product => product.id === cartItem.productId);
 
     cartItemHTML += `
-    <div class="cart-item-container" data-product-id="${matchingProduct.id}">
+    <div class="cart-item-container js-cart-item-container-${matchingProduct.id} " data-product-id="${matchingProduct.id}">
         <div class="delivery-date">
             Delivery date: Tuesday, June 21
         </div>
@@ -78,3 +77,14 @@ cart.forEach((cartItem) => {
 
 // 3. İyileştirme: += yerine = kullanımı (duruma göre değişebilir ama genelde daha güvenlidir)
 document.querySelector('.js-order-summary').innerHTML = cartItemHTML;
+
+document.querySelectorAll('.js-delete-link')
+    .forEach((deleteButton) => {
+        deleteButton.addEventListener('click', () => {
+            deleteFromCart(deleteButton.dataset.productId);
+
+            const container = document.querySelector(`.js-cart-item-container-${deleteButton.dataset.productId}`);
+            container.remove();
+        });
+
+    })
