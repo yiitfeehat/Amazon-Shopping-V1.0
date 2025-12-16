@@ -1,13 +1,45 @@
 import { cart, deleteFromCart } from "../data/cart.js";
 import { products } from "../data/products.js";
+import { deliveryOptions } from "../data/deliveryOptions.js";
+import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
+
 let cartItemHTML = '';
 
+// Düzeltme 1: Fonksiyon parametrelerini doğru alıyor
+function deliveryOptionsHTML(matchingProduct, cartItem) {
+    let html = '';
+
+    deliveryOptions.forEach((deliveryOption) => {
+        const today = dayjs();
+        const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
+        const dateString = deliveryDate.format('dddd, MMMM D');
+        const priceString = deliveryOption.priceCents === 0 ? 'FREE' : `$${deliveryOption.priceCents / 100}`;
+
+        // cartItem burada artık undefined değil
+        const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
+
+        html += `
+            <div class="delivery-option">
+                <input type="radio"
+                    ${isChecked ? 'checked' : ''}
+                    class="delivery-option-input"
+                    name="delivery-option-${matchingProduct.id}">
+                <div>
+                    <div class="delivery-option-date">${dateString}</div>
+                    <div class="delivery-option-price">${priceString} - Shipping</div>
+                </div>
+            </div>
+        `
+    });
+
+    return html;
+}
+
 cart.forEach((cartItem) => {
-    // 1. İyileştirme: .find() kullanımı
     const matchingProduct = products.find(product => product.id === cartItem.productId);
 
     cartItemHTML += `
-    <div class="cart-item-container js-cart-item-container-${matchingProduct.id} " data-product-id="${matchingProduct.id}">
+    <div class="cart-item-container js-cart-item-container-${matchingProduct.id}" data-product-id="${matchingProduct.id}">
         <div class="delivery-date">
             Delivery date: Tuesday, June 21
         </div>
@@ -39,52 +71,22 @@ cart.forEach((cartItem) => {
                 <div class="delivery-options-title">
                     Choose a delivery option:
                 </div>
-                
-                <div class="delivery-option">
-                    <input type="radio" checked
-                        class="delivery-option-input"
-                        name="delivery-option-${matchingProduct.id}">
-                    <div>
-                        <div class="delivery-option-date">Tuesday, June 21</div>
-                        <div class="delivery-option-price">FREE Shipping</div>
-                    </div>
-                </div>
-
-                <div class="delivery-option">
-                     <input type="radio"
-                        class="delivery-option-input"
-                        name="delivery-option-${matchingProduct.id}">
-                    <div>
-                        <div class="delivery-option-date">Wednesday, June 15</div>
-                        <div class="delivery-option-price">$4.99 - Shipping</div>
-                    </div>
-                </div>
-
-                <div class="delivery-option">
-                     <input type="radio"
-                        class="delivery-option-input"
-                        name="delivery-option-${matchingProduct.id}">
-                    <div>
-                        <div class="delivery-option-date">Monday, June 13</div>
-                        <div class="delivery-option-price">$9.99 - Shipping</div>
-                    </div>
-                </div>
+                ${deliveryOptionsHTML(matchingProduct, cartItem)}
             </div>
         </div>
     </div>
     `;
 });
 
-// 3. İyileştirme: += yerine = kullanımı (duruma göre değişebilir ama genelde daha güvenlidir)
 document.querySelector('.js-order-summary').innerHTML = cartItemHTML;
 
 document.querySelectorAll('.js-delete-link')
     .forEach((deleteButton) => {
         deleteButton.addEventListener('click', () => {
-            deleteFromCart(deleteButton.dataset.productId);
+            const productId = deleteButton.dataset.productId;
+            deleteFromCart(productId);
 
-            const container = document.querySelector(`.js-cart-item-container-${deleteButton.dataset.productId}`);
+            const container = document.querySelector(`.js-cart-item-container-${productId}`);
             container.remove();
         });
-
-    })
+    });
