@@ -1,6 +1,7 @@
 import { cart, deleteFromCart, updateDeliveryOption } from "../../data/cart.js";
-import { products } from "../../data/products.js";
-import { deliveryOptions } from "../../data/deliveryOptions.js";
+import { getProduct } from "../../data/products.js";
+import { deliveryOptions, getDeliveryOption } from "../../data/deliveryOptions.js";
+import { renderPaymentSummary } from "./paymentSummary.js";
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 
 // 1. DÜZELTME: Yardımcı fonksiyonu dışarı aldık (Performans ve okunabilirlik için)
@@ -39,17 +40,11 @@ export function renderOrderSummary() {
     let cartItemHTML = '';
 
     cart.forEach((cartItem) => {
-        const matchingProduct = products.find(product => product.id === cartItem.productId);
+        const matchingProduct = getProduct(cartItem.productId)
 
         const deliveryOptionId = cartItem.deliveryOptionId;
 
-        let deliveryOption;
-
-        deliveryOptions.forEach((option) => {
-            if (option.id === deliveryOptionId) {
-                deliveryOption = option;
-            }
-        });
+        const deliveryOption = getDeliveryOption(deliveryOptionId);
 
         const today = dayjs();
         const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
@@ -106,7 +101,7 @@ export function renderOrderSummary() {
 
                 // 3. DÜZELTME: container.remove() yerine fonksiyonu tekrar çağırıyoruz.
                 // Böylece hem liste yenileniyor hem de ileride yapacağın ödeme özeti güncelleniyor.
-                renderOrderSummary(); 
+                renderOrderSummary();
             });
         });
 
@@ -116,9 +111,9 @@ export function renderOrderSummary() {
             optionElement.addEventListener('click', () => {
                 const { productId, deliveryOptionId } = optionElement.dataset;
                 updateDeliveryOption(productId, deliveryOptionId);
-                
+
                 // Sayfayı yenilemek yerine (reload), fonksiyonu tekrar çalıştırıyoruz.
-                renderOrderSummary(); 
+                renderOrderSummary();
             })
         })
 }
