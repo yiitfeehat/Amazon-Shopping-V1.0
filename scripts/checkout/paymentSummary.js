@@ -4,7 +4,7 @@ import { getDeliveryOption } from "../../data/deliveryOptions.js";
 
 
 export function renderPaymentSummary() {
-  
+
     let totalItemsPriceCents = 0;
     let totalShippingPriceCents = 0;
     let totalBeforeTaxPriceCents = 0;
