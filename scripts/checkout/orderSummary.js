@@ -34,6 +34,7 @@ export function deliveryOptionsHTML(matchingProduct, cartItem) {
     return html;
 }
 
+
 export function renderOrderSummary() {
     // 2. DÜZELTME (EN ÖNEMLİSİ): Değişkeni fonksiyonun İÇİNE aldık.
     // Her çalıştığında sıfırlanması lazım, yoksa ürünler alt alta sürekli çoğalır.
@@ -102,6 +103,7 @@ export function renderOrderSummary() {
                 // 3. DÜZELTME: container.remove() yerine fonksiyonu tekrar çağırıyoruz.
                 // Böylece hem liste yenileniyor hem de ileride yapacağın ödeme özeti güncelleniyor.
                 renderOrderSummary();
+                renderPaymentSummary();
             });
         });
 
@@ -114,6 +116,7 @@ export function renderOrderSummary() {
 
                 // Sayfayı yenilemek yerine (reload), fonksiyonu tekrar çalıştırıyoruz.
                 renderOrderSummary();
+                renderPaymentSummary();
             })
         })
 }
