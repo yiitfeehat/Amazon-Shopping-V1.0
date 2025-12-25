@@ -1,12 +1,19 @@
 // IMPORTS
 import { cart, addToCart } from "../data/cart.js";
-import { products } from "../data/products.js";
+import { loadProductsFetch, products } from "../data/products.js";
 
 
-let productsHTML = '';
 
-products.forEach((product) => {
-    productsHTML += `<div class="product-container">
+loadProductsFetch().then(() => {
+    renderProductsGrid();
+});
+
+function renderProductsGrid() {
+    let productsHTML = '';
+
+    products.forEach((product) => {
+
+        productsHTML += `<div class="product-container">
             <div class="product-image-container">
                 <img class="product-image"
                 src=${product.image}>
@@ -54,33 +61,36 @@ products.forEach((product) => {
                 Add to Cart
             </button>
             </div>`
-})
-
-document.querySelector('.js-products-grid').innerHTML = productsHTML
-
-
-
-
-function updateCartQuantity() {
-    let totalQuantity = 0;
-
-    cart.forEach((cartItem) => {
-        totalQuantity += cartItem.quantity;
     })
 
-    document.querySelector('.js-cart-quantity').innerHTML = totalQuantity;
+    document.querySelector('.js-products-grid').innerHTML = productsHTML
 
+
+
+
+    function updateCartQuantity() {
+        let totalQuantity = 0;
+
+        cart.forEach((cartItem) => {
+            totalQuantity += cartItem.quantity;
+        })
+
+        document.querySelector('.js-cart-quantity').innerHTML = totalQuantity;
+
+    }
+    document.querySelectorAll('.js-add-to-cart').forEach((button) => {
+        button.addEventListener('click', () => {
+            const productId = button.dataset.productId;
+            const container = button.closest('.product-container');
+            const quantitySelector = container.querySelector('.js-product-quantity');
+            const quantity = Number(quantitySelector.value);
+
+            addToCart(productId, quantity);
+            updateCartQuantity();
+
+
+        })
+    })
+
+    updateCartQuantity();
 }
-document.querySelectorAll('.js-add-to-cart').forEach((button) => {
-    button.addEventListener('click', () => {
-        const productId = button.dataset.productId;
-        const container = button.closest('.product-container');
-        const quantitySelector = container.querySelector('.js-product-quantity');
-        const quantity = Number(quantitySelector.value);
-
-        addToCart(productId, quantity);
-        updateCartQuantity();
-
-
-    })
-})
