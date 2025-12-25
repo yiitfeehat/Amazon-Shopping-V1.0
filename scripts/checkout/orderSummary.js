@@ -2,9 +2,9 @@ import { cart, deleteFromCart, updateDeliveryOption } from "../../data/cart.js";
 import { getProduct } from "../../data/products.js";
 import { deliveryOptions, getDeliveryOption } from "../../data/deliveryOptions.js";
 import { renderPaymentSummary } from "./paymentSummary.js";
+import { formatCurrency } from "../utils/money.js";
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 
-// 1. DÜZELTME: Yardımcı fonksiyonu dışarı aldık (Performans ve okunabilirlik için)
 export function deliveryOptionsHTML(matchingProduct, cartItem) {
     let html = '';
 
@@ -12,7 +12,7 @@ export function deliveryOptionsHTML(matchingProduct, cartItem) {
         const today = dayjs();
         const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
         const dateString = deliveryDate.format('dddd, MMMM D');
-        const priceString = deliveryOption.priceCents === 0 ? 'FREE' : `$${deliveryOption.priceCents / 100} -`;
+        const priceString = deliveryOption.priceCents === 0 ? 'FREE' : `$${formatCurrency(deliveryOption.priceCents)} -`;
 
         const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
 
@@ -36,8 +36,7 @@ export function deliveryOptionsHTML(matchingProduct, cartItem) {
 
 
 export function renderOrderSummary() {
-    // 2. DÜZELTME (EN ÖNEMLİSİ): Değişkeni fonksiyonun İÇİNE aldık.
-    // Her çalıştığında sıfırlanması lazım, yoksa ürünler alt alta sürekli çoğalır.
+
     let cartItemHTML = '';
 
     cart.forEach((cartItem) => {
@@ -65,7 +64,7 @@ export function renderOrderSummary() {
                             ${matchingProduct.name}
                         </div>
                         <div class="product-price">
-                            $${(matchingProduct.priceCents / 100).toFixed(2)}
+                            $${formatCurrency(matchingProduct.priceCents)}
                         </div>
                         <div class="product-quantity">
                             <span>

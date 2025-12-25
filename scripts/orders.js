@@ -1,15 +1,17 @@
-import { orders } from '../data/orders.js';
+import { orders, deleteOrder } from '../data/orders.js';
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 import { getProduct, loadProductsFetch } from '../data/products.js';
-
+import { formatCurrency } from './utils/money.js';
 
 async function loadPage() {
+  document.querySelector('.orders-grid').innerHTML = '<h2>Loading orders...</h2>';
+
   await loadProductsFetch();
 
   let ordersHTML = '';
 
   orders.forEach((order) => {
-    // BURADA BİRAZDAN YAZACAĞIMIZ FONKSİYONU KULLANACAĞIZ
+
     ordersHTML += `
       <div class="order-container">
         <div class="order-header">
@@ -20,12 +22,13 @@ async function loadPage() {
             </div>
             <div class="order-total">
               <div class="order-header-label">Total:</div>
-              <div>$${(order.totalCostCents / 100).toFixed(2)}</div>
+              <div>$${formatCurrency(order.totalCostCents)}</div>
             </div>
           </div>
           <div class="order-header-right-section">
             <div class="order-header-label">Order ID:</div>
             <div>${order.id}</div>
+             <button class="track-package-button button-secondary js-delete-order" data-order-id="${order.id}" style="margin-top: 10px; background-color: #dc3545; color: white; border: none;">Delete Order</button>
           </div>
         </div>
         <div class="order-details-grid">
@@ -36,6 +39,14 @@ async function loadPage() {
   });
 
   document.querySelector('.orders-grid').innerHTML = ordersHTML;
+
+  document.querySelectorAll('.js-delete-order').forEach((button) => {
+    button.addEventListener('click', () => {
+      const orderId = button.dataset.orderId;
+      deleteOrder(orderId);
+      loadPage(); // Re-render the page
+    })
+  })
 }
 loadPage();
 

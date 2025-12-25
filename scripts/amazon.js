@@ -1,8 +1,9 @@
-// IMPORTS
 import { cart, addToCart } from "../data/cart.js";
 import { loadProductsFetch, products } from "../data/products.js";
+import { formatCurrency } from "./utils/money.js";
 
 
+document.querySelector('.js-products-grid').innerHTML = '<h2>Loading products...</h2>';
 
 loadProductsFetch().then(() => {
     renderProductsGrid();
@@ -11,7 +12,24 @@ loadProductsFetch().then(() => {
 function renderProductsGrid() {
     let productsHTML = '';
 
-    products.forEach((product) => {
+    const url = new URL(window.location.href);
+    const search = url.searchParams.get('search');
+
+    let filteredProducts = products;
+    if (search) {
+        filteredProducts = products.filter((product) => {
+            // Case insensitive search
+            let matchingKeyword = false;
+            product.keywords.forEach((keyword) => {
+                if (keyword.toLowerCase().includes(search.toLowerCase())) {
+                    matchingKeyword = true;
+                }
+            })
+            return matchingKeyword || product.name.toLowerCase().includes(search.toLowerCase());
+        });
+    }
+
+    filteredProducts.forEach((product) => {
 
         productsHTML += `<div class="product-container">
             <div class="product-image-container">
@@ -32,7 +50,7 @@ function renderProductsGrid() {
             </div>
 
             <div class="product-price">
-                $${(product.priceCents / 100).toFixed(2)}
+                $${formatCurrency(product.priceCents)}
             </div>
 
             <div class="product-quantity-container">
@@ -66,31 +84,35 @@ function renderProductsGrid() {
     document.querySelector('.js-products-grid').innerHTML = productsHTML
 
 
-
-
     function updateCartQuantity() {
-        let totalQuantity = 0;
-
-        cart.forEach((cartItem) => {
-            totalQuantity += cartItem.quantity;
-        })
-
+        const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
         document.querySelector('.js-cart-quantity').innerHTML = totalQuantity;
-
     }
+
     document.querySelectorAll('.js-add-to-cart').forEach((button) => {
         button.addEventListener('click', () => {
-            const productId = button.dataset.productId;
+            const { productId } = button.dataset;
             const container = button.closest('.product-container');
             const quantitySelector = container.querySelector('.js-product-quantity');
             const quantity = Number(quantitySelector.value);
 
             addToCart(productId, quantity);
             updateCartQuantity();
-
-
         })
     })
 
     updateCartQuantity();
 }
+
+document.querySelector('.search-button').addEventListener('click', () => {
+    const search = document.querySelector('.search-bar').value;
+    window.location.href = `amazon.html?search=${search}`;
+});
+
+// Allow pressing "Enter" in the search bar
+document.querySelector('.search-bar').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        const search = document.querySelector('.search-bar').value;
+        window.location.href = `amazon.html?search=${search}`;
+    }
+});
