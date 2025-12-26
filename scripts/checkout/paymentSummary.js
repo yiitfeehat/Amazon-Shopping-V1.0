@@ -33,7 +33,7 @@ export function renderPaymentSummary() {
         </div>
         <div style="text-align: center; margin-top: 20px;">
             Your cart is empty. <br>
-            <a href="amazon.html" class="link-primary">View products</a>
+            <a href="index.html" class="link-primary">View products</a>
         </div>
      `;
     return; // Stop execution
