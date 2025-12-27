@@ -1,5 +1,7 @@
 # Amazon Clone Project 🛒
 
+![Amazon Clone Demo](GIFS/PC-VERSION%20.gif)
+
 Bu proje, modern web geliştirme prensipleri kullanılarak geliştirilmiş, uçtan uca fonksiyonel bir **E-Ticaret (Amazon)** klonudur. Vanilla JavaScript kullanılarak, harici bir framework bağımlılığı olmadan (No-Framework) geliştirilmiştir.
 
 ## 🌟 Özellikler
